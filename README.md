@@ -59,8 +59,12 @@ The codebase follows **SOLID** principles: every service is coded against an int
 | **Security** | Spring Security | — | Authentication, authorization, method security |
 | **Token** | JJWT (io.jsonwebtoken) | 0.12.6 | Issue & validate JWT (HS512) |
 | **Validation** | Jakarta Bean Validation | — | Request payload validation (`@Valid`) |
+| **Mapping** | MapStruct | 1.6.3 | Compile-time DTO ↔ Entity mapping (`UserMapper`) |
+| **API Docs** | SpringDoc OpenAPI (Swagger UI) | 2.8.6 | Interactive API docs at `/swagger-ui.html` |
+| **Monitoring** | Spring Boot Actuator | — | Health/info/metrics at `/actuator/**` |
 | **Mail** | Spring Boot Starter Mail | — | Transactional emails (`EmailService`) |
 | **Boilerplate** | Lombok | — | Reduce boilerplate (getter/setter/builder) |
+| **Dev Experience** | Spring Boot DevTools | — | Hot reload during development |
 | **Build** | Maven (`mvnw` wrapper) | 3.9.x | Dependency management & packaging |
 | **Test** | JUnit 5 + Spring Security Test | — | Integration testing |
 
@@ -208,7 +212,7 @@ All settings live in `src/main/resources/application.yaml` and can be overridden
 
 ## 🔌 API Reference
 
-Base path: **`/api`**
+Base path: **`/api`** · Interactive docs: **`/swagger-ui.html`** · Health: **`/actuator/health`**
 
 ### 🔑 Authentication — `/api/auth`
 

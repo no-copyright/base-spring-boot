@@ -44,3 +44,21 @@ app:
     admin-username: admin
     admin-email: admin@springboot.vn
     admin-password: admin123
+
+# Actuator: only expose health & info publicly; keep the rest off by default
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# SpringDoc / Swagger UI
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs

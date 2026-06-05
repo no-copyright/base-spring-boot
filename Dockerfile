@@ -31,6 +31,12 @@ RUN cp target/*.jar app.jar
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
+# curl is needed for the container HEALTHCHECK below.
+# curl phục vụ cho HEALTHCHECK phía dưới.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create an unprivileged user / Tạo người dùng không đặc quyền
 RUN groupadd --system spring && useradd --system --gid spring spring
 
@@ -44,11 +50,9 @@ EXPOSE 8080
 # JVM tối ưu cho container (tôn trọng giới hạn bộ nhớ cgroup).
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"
 
-# HEALTHCHECK is intentionally omitted: the JRE image ships without curl and the
-# app has no public GET endpoint. Add `spring-boot-starter-actuator`, then enable:
-#   HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-#       CMD wget -qO- http://localhost:8080/actuator/health | grep -q UP || exit 1
-# HEALTHCHECK được bỏ qua có chủ đích: image JRE không có curl và app chưa có
-# endpoint GET công khai. Hãy thêm `spring-boot-starter-actuator` rồi bật dòng trên.
+# Liveness/readiness probe via Spring Boot Actuator.
+# Kiểm tra sức khoẻ qua Spring Boot Actuator.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -fsS http://localhost:8080/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
