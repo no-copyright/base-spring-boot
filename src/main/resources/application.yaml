@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: spring-boot
+  datasource:
+    url: ${DB_URL:jdbc:mariadb://localhost:3306/dev_db}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+  mail:
+    port: 465
+    host: smtp.example.com
+    username:
+    password:
+    default-encoding: UTF-8
+    properties:
+      mail:
+        SMTP:
+          auth: true
+          STARTTLS:
+            enable: true
+            required: true
+          ssl:
+            enable: true
+
+# Application specific configuration
+app:
+  jwt:
+    # Base64-encoded 512-bit secret. Override via APP_JWT_SECRET in production.
+    secret: ${APP_JWT_SECRET:fJV2+5QqrlNHmoqnaO4FliZ6rdwxbyi4ohpjMeKCKI+OXbe4y6eup8Vj0TaJem/aj8reEfbkK9aWenBdS7xlIg==}
+    issuer: spring-boot
+    access-token-expiration: 3600000        # 1 hour (ms)
+    refresh-token-expiration: 604800000     # 7 days (ms)
+  mail:
+    # "From" address for outgoing mail (EmailService)
+    from: no-reply@springboot.vn
+  init:
+    # Seed default roles/permissions/admin account on startup
+    enabled: true
+    admin-username: admin
+    admin-email: admin@springboot.vn
+    admin-password: admin123
