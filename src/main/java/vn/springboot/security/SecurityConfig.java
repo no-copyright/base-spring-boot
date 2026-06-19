@@ -40,6 +40,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
+            // WebSocket/STOMP handshake (auth happens on the STOMP CONNECT frame)
+            "/ws/**",
             // Actuator health probe
             "/actuator/health",
             "/actuator/health/**"

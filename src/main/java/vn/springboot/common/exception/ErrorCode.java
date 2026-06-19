@@ -34,6 +34,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(4041, "Role not found", HttpStatus.NOT_FOUND),
     RESOURCE_NOT_FOUND(4042, "Resource not found", HttpStatus.NOT_FOUND),
     REFRESH_TOKEN_NOT_FOUND(4043, "Refresh token not found", HttpStatus.NOT_FOUND),
+    NOTIFICATION_NOT_FOUND(4044, "Notification not found", HttpStatus.NOT_FOUND),
 
     // 409x - conflict
     USERNAME_EXISTED(4090, "Username already exists", HttpStatus.CONFLICT),
