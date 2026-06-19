@@ -9,21 +9,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import vn.springboot.entity.user.PermissionEntity;
+import vn.springboot.entity.user.RoleEntity;
+import vn.springboot.entity.user.UserEntity;
+import vn.springboot.security.CustomUserDetails;
 import vn.springboot.security.JwtProperties;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Issues and validates stateless access tokens (HS512 signed JWTs).
  * Refresh tokens are handled separately by the auth service (DB-backed).
+ *
+ * <p>Beyond the combined {@code authorities} claim (kept for Spring Security
+ * interop), the token also carries decoded {@code roles} and {@code permissions}
+ * arrays plus basic identity claims ({@code uid}, {@code email}, {@code fullName})
+ * so a front-end can build menus/guards straight from the decoded token without
+ * an extra round-trip.
  */
 @Slf4j
 @Service
 public class JwtService {
 
     private static final String CLAIM_AUTHORITIES = "authorities";
+    private static final String CLAIM_ROLES = "roles";
+    private static final String CLAIM_PERMISSIONS = "permissions";
+    private static final String CLAIM_UID = "uid";
+    private static final String CLAIM_EMAIL = "email";
+    private static final String CLAIM_FULL_NAME = "fullName";
 
     private final JwtProperties properties;
     private final SecretKey signingKey;
@@ -34,19 +51,45 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
+        // The combined authorities (roles prefixed ROLE_, plus bare permissions)
+        // are what Spring Security would consume; kept for interop.
         List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
         long now = System.currentTimeMillis();
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .issuer(properties.getIssuer())
                 .subject(userDetails.getUsername())
                 .claim(CLAIM_AUTHORITIES, authorities)
                 .issuedAt(new Date(now))
-                .expiration(new Date(now + properties.getAccessTokenExpiration()))
-                .signWith(signingKey)
-                .compact();
+                .expiration(new Date(now + properties.getAccessTokenExpiration()));
+
+        // Enrich with decoded roles/permissions and identity when we have the
+        // full user entity (always true for our login/refresh flows).
+        if (userDetails instanceof CustomUserDetails principal) {
+            UserEntity user = principal.getUser();
+            builder.claim(CLAIM_UID, user.getId())
+                    .claim(CLAIM_EMAIL, user.getEmail())
+                    .claim(CLAIM_FULL_NAME, user.getFullName())
+                    .claim(CLAIM_ROLES, roleNames(user))
+                    .claim(CLAIM_PERMISSIONS, permissionNames(user));
+        }
+
+        return builder.signWith(signingKey).compact();
+    }
+
+    private Set<String> roleNames(UserEntity user) {
+        return user.getRoles().stream()
+                .map(RoleEntity::getName)
+                .collect(Collectors.toCollection(java.util.TreeSet::new));
+    }
+
+    private Set<String> permissionNames(UserEntity user) {
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(PermissionEntity::getName)
+                .collect(Collectors.toCollection(java.util.TreeSet::new));
     }
 
     public String extractUsername(String token) {
