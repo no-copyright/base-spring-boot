@@ -1,0 +1,8 @@
+# Seed profile — sample/demo data for local & staging.
+# Activate with:  --spring.profiles.active=seed   (or SPRING_PROFILES_ACTIVE=seed)
+#
+# Adds db/seed to Flyway's locations so the repeatable R__seed_*.sql scripts run
+# AFTER the versioned schema migrations. Never enable this profile in production.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed

@@ -3,8 +3,12 @@ package vn.springboot.service;
 import vn.springboot.dto.request.notification.DeviceTokenRequest;
 import vn.springboot.dto.request.notification.NotificationSearchRequest;
 import vn.springboot.dto.request.notification.SendNotificationCommand;
+import vn.springboot.dto.request.notification.UpdateNotificationPreferencesRequest;
 import vn.springboot.dto.response.PageResponse;
+import vn.springboot.dto.response.notification.NotificationPreferenceResponse;
 import vn.springboot.dto.response.notification.NotificationResponse;
+
+import java.util.List;
 
 /**
  * Notification facade: emits notifications (persist + real-time WebSocket push
@@ -18,7 +22,12 @@ public interface NotificationService {
 
     // --- Emit -------------------------------------------------------------
 
-    /** Persist a notification for one user and deliver it in real time. */
+    /**
+     * Persist a notification for one user and deliver it in real time, honouring
+     * the user's per-type preferences: in-app delivery is skipped (and the row not
+     * persisted) when muted in-app, push is skipped when muted for push.
+     * Returns {@code null} when the type is fully muted for the user.
+     */
     NotificationResponse notifyUser(String username, SendNotificationCommand command);
 
     /** Broadcast a transient notification to every connected client (not persisted). */
@@ -35,6 +44,14 @@ public interface NotificationService {
     void markAllAsRead();
 
     void delete(Long id);
+
+    // --- Per-type preferences (current user) ------------------------------
+
+    /** Effective settings for every notification type (catalog + toggles). */
+    List<NotificationPreferenceResponse> getMyPreferences();
+
+    /** Upsert the current user's toggles for the supplied types; returns the full set. */
+    List<NotificationPreferenceResponse> updateMyPreferences(UpdateNotificationPreferencesRequest request);
 
     // --- Device tokens (FCM groundwork) -----------------------------------
 

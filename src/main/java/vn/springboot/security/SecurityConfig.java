@@ -42,6 +42,8 @@ public class SecurityConfig {
             "/swagger-ui.html",
             // WebSocket/STOMP handshake (auth happens on the STOMP CONNECT frame)
             "/ws/**",
+            // Publicly served uploaded files (avatars, etc.) — keep in sync with app.storage.public-path
+            "/files/**",
             // Actuator health probe
             "/actuator/health",
             "/actuator/health/**"

@@ -13,11 +13,15 @@ public enum ErrorCode {
 
     // 9xxx - generic / server
     EMAIL_SEND_FAILED(9000, "Failed to send email", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_STORAGE_FAILED(9001, "Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR),
     UNCATEGORIZED(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 4000 - bad request / validation
     INVALID_REQUEST(4000, "Invalid request", HttpStatus.BAD_REQUEST),
     VALIDATION_ERROR(4001, "Validation failed", HttpStatus.BAD_REQUEST),
+    FILE_EMPTY(4002, "Uploaded file is empty", HttpStatus.BAD_REQUEST),
+    INVALID_FILE_TYPE(4003, "Unsupported file type", HttpStatus.BAD_REQUEST),
+    FILE_TOO_LARGE(4004, "Uploaded file is too large", HttpStatus.PAYLOAD_TOO_LARGE),
 
     // 401x - authentication
     UNAUTHENTICATED(4010, "Authentication required", HttpStatus.UNAUTHORIZED),

@@ -6,11 +6,26 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     driver-class-name: org.mariadb.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: ${APP_UPLOAD_MAX_FILE_SIZE:5MB}
+      max-request-size: ${APP_UPLOAD_MAX_REQUEST_SIZE:10MB}
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway is the single source of truth for the schema.
+      # 'validate' = startup fails if entities and the migrated schema drift apart.
+      # If a type mismatch (boolean/datetime precision) blocks boot, switch to 'none'.
+      ddl-auto: validate
     show-sql: true
     open-in-view: false
+  # Flyway: versioned SQL migrations under src/main/resources/db/migration.
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # Dev DBs created by the old ddl-auto=update get baselined so V1 is treated as
+    # "already applied" instead of trying to recreate existing tables.
+    baseline-on-migrate: true
+    baseline-version: 1
   mail:
     port: 465
     host: smtp.example.com
@@ -44,6 +59,20 @@ app:
     admin-username: admin
     admin-email: admin@springboot.vn
     admin-password: admin123
+  fcm:
+    # Real FCM push. Keep false for local/base; set true + provide a service-account
+    # JSON to enable. When false, pushes are logged (no-op) so the app needs no credentials.
+    enabled: ${APP_FCM_ENABLED:false}
+    # Spring resource location of the Firebase service-account JSON.
+    # e.g. classpath:firebase-service-account.json  OR  file:/etc/secrets/firebase.json
+    credentials: ${APP_FCM_CREDENTIALS:classpath:firebase-service-account.json}
+  storage:
+    # Local filesystem root for uploads; override per environment / mount a volume in prod.
+    location: ${APP_STORAGE_LOCATION:uploads}
+    # URL prefix that serves stored files (keep in sync with SecurityConfig public endpoints).
+    public-path: /files
+    # Optional absolute host/CDN prefix for returned URLs; empty -> root-relative URLs.
+    base-url: ${APP_STORAGE_BASE_URL:}
 
 # Actuator: only expose health & info publicly; keep the rest off by default
 management:

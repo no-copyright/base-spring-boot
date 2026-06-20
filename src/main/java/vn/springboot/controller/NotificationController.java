@@ -8,16 +8,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.springboot.common.response.ApiResponse;
 import vn.springboot.dto.request.notification.DeviceTokenRequest;
 import vn.springboot.dto.request.notification.NotificationSearchRequest;
+import vn.springboot.dto.request.notification.UpdateNotificationPreferencesRequest;
 import vn.springboot.dto.response.PageResponse;
+import vn.springboot.dto.response.notification.NotificationPreferenceResponse;
 import vn.springboot.dto.response.notification.NotificationResponse;
 import vn.springboot.dto.response.notification.UnreadCountResponse;
 import vn.springboot.service.NotificationService;
+
+import java.util.List;
 
 /**
  * Notification centre for the authenticated user: list, unread badge, mark-read
@@ -57,6 +62,19 @@ public class NotificationController {
     public ApiResponse<Void> delete(@PathVariable Long id) {
         notificationService.delete(id);
         return ApiResponse.success("Deleted", null);
+    }
+
+    // --- Per-type preferences ---------------------------------------------
+
+    @GetMapping("/preferences")
+    public ApiResponse<List<NotificationPreferenceResponse>> getPreferences() {
+        return ApiResponse.success(notificationService.getMyPreferences());
+    }
+
+    @PutMapping("/preferences")
+    public ApiResponse<List<NotificationPreferenceResponse>> updatePreferences(
+            @Valid @RequestBody UpdateNotificationPreferencesRequest request) {
+        return ApiResponse.success("Preferences updated", notificationService.updateMyPreferences(request));
     }
 
     // --- Device tokens (FCM groundwork) -----------------------------------

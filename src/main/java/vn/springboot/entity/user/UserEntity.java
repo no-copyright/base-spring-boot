@@ -42,6 +42,10 @@ public class UserEntity extends BaseEntity {
     @Column(name = "full_name", length = 100)
     private String fullName;
 
+    /** Public URL of the user's avatar image (uploaded via the file storage). */
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
     @Builder.Default
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;

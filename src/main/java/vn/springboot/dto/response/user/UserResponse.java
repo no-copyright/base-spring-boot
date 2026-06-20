@@ -21,6 +21,8 @@ public class UserResponse {
 
     private String fullName;
 
+    private String avatarUrl;
+
     private boolean enabled;
 
     private Set<String> roles;

@@ -1,21 +1,29 @@
 package vn.springboot.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import vn.springboot.common.response.ApiResponse;
+import vn.springboot.dto.request.user.UpdateProfileRequest;
 import vn.springboot.dto.request.user.UserSearchRequest;
 import vn.springboot.dto.response.PageResponse;
 import vn.springboot.dto.response.user.UserResponse;
 import vn.springboot.service.UserService;
 
 /**
- * Example of a permission-protected resource. Access requires the
- * {@code USER_READ} authority (granted via a role) — see {@code @PreAuthorize}.
+ * User resource: admin listing (permission-protected) plus self-service
+ * profile/avatar endpoints under {@code /me} for the authenticated user.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +36,23 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse<PageResponse<UserResponse>> search(@ModelAttribute UserSearchRequest request) {
         return ApiResponse.success(userService.search(request));
+    }
+
+    // --- Current user (self-service) --------------------------------------
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMyProfile() {
+        return ApiResponse.success(userService.getMyProfile());
+    }
+
+    @PutMapping("/me")
+    public ApiResponse<UserResponse> updateMyProfile(@Valid @RequestBody UpdateProfileRequest request) {
+        return ApiResponse.success("Profile updated", userService.updateMyProfile(request));
+    }
+
+    @PostMapping(path = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UserResponse> updateMyAvatar(@RequestParam("file") MultipartFile file) {
+        return ApiResponse.success("Avatar updated", userService.updateMyAvatar(file));
     }
 
     @GetMapping("/{id}")

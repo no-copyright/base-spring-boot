@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets ###
+# Firebase service-account JSON for FCM — never commit
+firebase-service-account.json
+**/firebase-service-account.json
+
+### Uploaded files (local storage root) ###
+uploads/
