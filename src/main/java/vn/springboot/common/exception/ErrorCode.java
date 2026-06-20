@@ -39,12 +39,15 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND(4042, "Resource not found", HttpStatus.NOT_FOUND),
     REFRESH_TOKEN_NOT_FOUND(4043, "Refresh token not found", HttpStatus.NOT_FOUND),
     NOTIFICATION_NOT_FOUND(4044, "Notification not found", HttpStatus.NOT_FOUND),
+    PERMISSION_NOT_FOUND(4045, "Permission not found", HttpStatus.NOT_FOUND),
 
     // 409x - conflict
     USERNAME_EXISTED(4090, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_EXISTED(4091, "Email already exists", HttpStatus.CONFLICT),
     REFRESH_TOKEN_REVOKED(4092, "Refresh token has been revoked", HttpStatus.UNAUTHORIZED),
-    REFRESH_TOKEN_EXPIRED(4093, "Refresh token has expired", HttpStatus.UNAUTHORIZED);
+    REFRESH_TOKEN_EXPIRED(4093, "Refresh token has expired", HttpStatus.UNAUTHORIZED),
+    ROLE_NAME_EXISTED(4094, "Role name already exists", HttpStatus.CONFLICT),
+    ROLE_PROTECTED(4095, "Built-in role cannot be modified or deleted", HttpStatus.CONFLICT);
 
     private final int code;
     private final String message;

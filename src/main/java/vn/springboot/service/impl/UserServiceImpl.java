@@ -18,13 +18,17 @@ import vn.springboot.dto.response.PageResponse;
 import vn.springboot.dto.response.user.UserResponse;
 import vn.springboot.entity.user.UserEntity;
 import vn.springboot.mapper.UserMapper;
+import vn.springboot.dto.request.user.AssignRolesRequest;
 import vn.springboot.dto.response.file.FileUploadResponse;
+import vn.springboot.entity.user.RoleEntity;
+import vn.springboot.repository.RoleRepository;
 import vn.springboot.repository.UserRepository;
 import vn.springboot.repository.specification.UserSpecification;
 import vn.springboot.security.SecurityUtils;
 import vn.springboot.service.FileService;
 import vn.springboot.service.UserService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private static final String AVATAR_DIR = "avatars";
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final FileService fileService;
     private final StorageProperties storageProperties;
@@ -76,6 +81,24 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public UserResponse assignRoles(Long userId, AssignRolesRequest request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setRoles(resolveRoles(request.getRoleIds()));
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    /** Resolve role ids to entities; every id must exist. */
+    private Set<RoleEntity> resolveRoles(Set<Long> roleIds) {
+        List<RoleEntity> found = roleRepository.findAllById(roleIds);
+        if (found.size() != roleIds.size()) {
+            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+        }
+        return new HashSet<>(found);
     }
 
     @Override

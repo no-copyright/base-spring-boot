@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import vn.springboot.common.response.ApiResponse;
+import vn.springboot.dto.request.user.AssignRolesRequest;
 import vn.springboot.dto.request.user.UpdateProfileRequest;
 import vn.springboot.dto.request.user.UserSearchRequest;
 import vn.springboot.dto.response.PageResponse;
@@ -22,8 +23,10 @@ import vn.springboot.dto.response.user.UserResponse;
 import vn.springboot.service.UserService;
 
 /**
- * User resource: admin listing (permission-protected) plus self-service
- * profile/avatar endpoints under {@code /me} for the authenticated user.
+ * User resource. Three groups:
+ *   - Admin (permission-protected): list/detail users, assign roles.
+ *   - Self-service ({@code /me}): every authenticated user — including admins —
+ *     reads/updates their own profile and avatar here.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -59,5 +62,13 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse<UserResponse> getById(@PathVariable Long id) {
         return ApiResponse.success(userService.getById(id));
+    }
+
+    /** Admin: set the roles of a user. */
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
+    public ApiResponse<UserResponse> assignRoles(@PathVariable Long id,
+                                                 @Valid @RequestBody AssignRolesRequest request) {
+        return ApiResponse.success("Roles updated", userService.assignRoles(id, request));
     }
 }

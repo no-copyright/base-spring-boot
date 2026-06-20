@@ -259,13 +259,31 @@ Dữ liệu bắt buộc để hệ thống chạy: roles, permissions, tài kho
 
 ## 8. DOC BÀN GIAO API CHO FE — bắt buộc cho mỗi chức năng có endpoint
 
-- Vị trí: `docs/<FEATURE>_API.md` (tiếng Việt, theo phong cách `docs/AUTH_RBAC_API.md` & `docs/WEBSOCKET_NOTIFICATION.md`).
-- Dùng **template** `docs/_TEMPLATE_FEATURE_API.md` làm khung.
+> **Tách doc theo ĐỐI TƯỢNG FE, không gộp chung.** Hệ thống có 2 frontend khác nhau:
+> **Admin Platform** và **Client app (user cuối)**. Mỗi endpoint thuộc về một bên — viết vào đúng doc của bên đó.
+
+### 8.1 Phân loại endpoint admin hay client
+
+- **Admin** → có `@PreAuthorize("hasAuthority('...')")` / `hasRole(...)` với quyền quản trị
+  (vd `USER_READ`, `USER_WRITE`, `ROLE_WRITE`, ...), hoặc thao tác trên **tài nguyên của người khác / toàn hệ thống**
+  (quản lý user, role, permission, cấu hình, báo cáo). → viết vào **`docs/admin/`**.
+- **Client** → chỉ cần đăng nhập và thao tác trên **tài nguyên của chính mình** (self-service):
+  hồ sơ `/me`, notification của bản thân, upload của user, đặt thông báo... → viết vào **`docs/client/`**.
+- **Dùng chung cả hai** (vd `POST /api/auth/login`, `POST /api/files`): viết đầy đủ ở **`docs/client/`**
+  và **link tham chiếu** từ doc admin (đừng mô tả lặp 2 nơi). Nếu thuần auth, gom vào `docs/client/AUTH_API.md`.
+
+### 8.2 Vị trí & cách viết
+
+- File: `docs/admin/<FEATURE>_API.md` hoặc `docs/client/<FEATURE>_API.md` (tiếng Việt, theo phong cách doc hiện có).
+- Dùng **template** `docs/_TEMPLATE_FEATURE_API.md` làm khung; ghi rõ đầu doc đối tượng là **Admin** hay **Client**.
 - Mô tả **đủ chi tiết để FE tự call được, không cần hỏi lại**, gồm:
-  - Tổng quan chức năng + yêu cầu auth (header `Authorization: Bearer <token>`, quyền cần có).
-  - Mỗi endpoint: method + path, mô tả, query/path params, **request body mẫu (JSON)**, **response mẫu (JSON đầy đủ envelope `ApiResponse`)**, các mã lỗi (`code`) có thể trả về.
+  - Tổng quan chức năng + yêu cầu auth (header `Authorization: Bearer <token>`, **quyền cần có** nếu là admin).
+  - Mỗi endpoint: method + path, mô tả, query/path params, **request body mẫu (JSON)**,
+    **response mẫu (JSON đầy đủ envelope `ApiResponse`)**, các mã lỗi (`code`) có thể trả về.
   - Enum/giá trị hợp lệ (vd các `NotificationType`), quy tắc phân trang, định dạng thời gian (ISO-8601/`Instant`).
 - Nhắc FE: response luôn bọc trong `{ code, message, data, timestamp }`; `code = 1000` là thành công.
+- Một chức năng có **cả** endpoint admin lẫn client (vd User: admin quản lý + client tự sửa `/me`)
+  → tách thành 2 doc: phần admin ở `docs/admin/`, phần `/me` ở `docs/client/`.
 
 ---
 
@@ -279,7 +297,7 @@ Dữ liệu bắt buộc để hệ thống chạy: roles, permissions, tài kho
 - [ ] DTO có validation; Service đặt `@Transactional` đúng chỗ; lỗi qua `AppException`/`ErrorCode`.
 - [ ] Controller mỏng, trả `ApiResponse`, có `@PreAuthorize` nếu cần.
 - [ ] Có unit test vài case; `./mvnw test` xanh.
-- [ ] Có doc bàn giao FE `docs/<FEATURE>_API.md`.
+- [ ] Có doc bàn giao FE, **tách đúng đối tượng**: endpoint admin → `docs/admin/`, endpoint client → `docs/client/` (xem §8).
 - [ ] Code đồng nhất style hiện tại (đặt tên, Javadoc, Lombok, package).
 
 ---
