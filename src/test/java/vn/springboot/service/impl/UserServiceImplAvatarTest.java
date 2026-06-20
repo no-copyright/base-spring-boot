@@ -12,13 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import vn.springboot.common.exception.AppException;
 import vn.springboot.common.exception.ErrorCode;
 import vn.springboot.config.StorageProperties;
+import vn.springboot.dto.response.file.FileUploadResponse;
 import vn.springboot.dto.response.user.UserResponse;
 import vn.springboot.entity.user.UserEntity;
 import vn.springboot.mapper.UserMapper;
 import vn.springboot.repository.UserRepository;
 import vn.springboot.security.CustomUserDetails;
-import vn.springboot.storage.StorageService;
-import vn.springboot.storage.StoredFile;
+import vn.springboot.service.FileService;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,13 +36,13 @@ class UserServiceImplAvatarTest {
 
     @Mock UserRepository userRepository;
     @Mock UserMapper userMapper;
-    @Mock StorageService storageService;
+    @Mock FileService fileService;
 
     private UserServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new UserServiceImpl(userRepository, userMapper, storageService, new StorageProperties());
+        service = new UserServiceImpl(userRepository, userMapper, fileService, new StorageProperties());
     }
 
     @AfterEach
@@ -65,8 +65,8 @@ class UserServiceImplAvatarTest {
         UserResponse response = UserResponse.builder().id(1L).avatarUrl("/files/avatars/new.png").build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(storageService.store(file, "avatars"))
-                .thenReturn(new StoredFile("/files/avatars/new.png", "new.png", "image/png", 3));
+        when(fileService.upload(file, "avatars"))
+                .thenReturn(FileUploadResponse.builder().id(9L).url("/files/avatars/new.png").build());
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(response);
 
@@ -74,7 +74,7 @@ class UserServiceImplAvatarTest {
 
         assertEquals("/files/avatars/new.png", result.getAvatarUrl());
         assertEquals("/files/avatars/new.png", user.getAvatarUrl());
-        verify(storageService).delete("/files/avatars/old.png");
+        verify(fileService).deleteByUrl("/files/avatars/old.png");
     }
 
     @Test
@@ -84,6 +84,6 @@ class UserServiceImplAvatarTest {
         AppException ex = assertThrows(AppException.class, () -> service.updateMyAvatar(file));
 
         assertEquals(ErrorCode.INVALID_FILE_TYPE, ex.getErrorCode());
-        verify(storageService, never()).store(any(), eq("avatars"));
+        verify(fileService, never()).upload(any(), eq("avatars"));
     }
 }

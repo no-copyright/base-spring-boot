@@ -9,29 +9,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import vn.springboot.common.response.ApiResponse;
 import vn.springboot.dto.response.file.FileUploadResponse;
-import vn.springboot.storage.StoredFile;
-import vn.springboot.storage.StorageService;
+import vn.springboot.service.FileService;
 
 /**
- * Generic file upload for the authenticated user. Returns a public URL the FE
- * can then attach to whatever resource it is editing (e.g. an avatar). Reusable
- * across features — domain-specific helpers (like avatar) build on this.
+ * Generic file upload for the authenticated user: stores the bytes, registers
+ * the file in the {@code files} table, and returns its id + public URL. The FE
+ * attaches the URL (or id) to whatever resource it is editing. Reusable across
+ * features — domain helpers (like avatar) build on the same {@code FileService}.
  */
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class FileController {
 
-    private final StorageService storageService;
+    private final FileService fileService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<FileUploadResponse> upload(@RequestParam("file") MultipartFile file) {
-        StoredFile stored = storageService.store(file, "uploads");
-        return ApiResponse.success(FileUploadResponse.builder()
-                .url(stored.url())
-                .filename(stored.filename())
-                .contentType(stored.contentType())
-                .size(stored.size())
-                .build());
+        return ApiResponse.success(fileService.upload(file, "misc"));
     }
 }

@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FileUploadResponse {
 
+    /** Registry id in the {@code files} table — reference this from other resources. */
+    private Long id;
+
     private String url;
 
     private String filename;

@@ -1,6 +1,5 @@
 -- =====================================================================
--- V1 — Baseline schema
--- Mirrors the JPA entities that previously lived under ddl-auto=update.
+-- V1 — Baseline schema (single source of truth for a fresh database).
 -- From here on, every schema change MUST be a new V{n}__*.sql migration.
 --
 -- Conventions:
@@ -8,6 +7,8 @@
 --   * Every table carries the BaseEntity audit columns
 --     (created_at, updated_at, created_by, updated_by)
 --   * Instant  -> datetime(6)   |  boolean -> boolean (tinyint(1))
+--   * Foreign keys are declared here (entities store *_id as plain columns,
+--     no JPA relationship mapping — see CLAUDE.md §4)
 --   * Join tables (M2M) own a composite PK and FKs to both sides
 -- =====================================================================
 
@@ -61,6 +62,7 @@ CREATE TABLE users (
     email      VARCHAR(100) NOT NULL,
     password   VARCHAR(255) NOT NULL,
     full_name  VARCHAR(100)     NULL,
+    avatar_url VARCHAR(500)     NULL,
     enabled    BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at DATETIME(6)      NULL,
     updated_at DATETIME(6)      NULL,
@@ -141,4 +143,44 @@ CREATE TABLE device_tokens (
     PRIMARY KEY (id),
     CONSTRAINT uk_device_tokens_token UNIQUE (token),
     CONSTRAINT fk_device_tokens_user  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+-- ---------------------------------------------------------------------
+-- notification_preferences (per-user, per-type opt-out)
+-- Missing row = enabled. Unique (user_id, type) doubles as the lookup index.
+-- ---------------------------------------------------------------------
+CREATE TABLE notification_preferences (
+    id             BIGINT      NOT NULL AUTO_INCREMENT,
+    user_id        BIGINT      NOT NULL,
+    type           VARCHAR(50) NOT NULL,
+    in_app_enabled BOOLEAN     NOT NULL DEFAULT TRUE,
+    push_enabled   BOOLEAN     NOT NULL DEFAULT TRUE,
+    created_at     DATETIME(6)     NULL,
+    updated_at     DATETIME(6)     NULL,
+    created_by     VARCHAR(100)    NULL,
+    updated_by     VARCHAR(100)    NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_notif_pref_user_type UNIQUE (user_id, type),
+    CONSTRAINT fk_notif_pref_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+-- ---------------------------------------------------------------------
+-- files (upload registry: metadata for audit / ownership / cleanup)
+-- Bytes live in the storage backend; this table tracks them.
+-- ---------------------------------------------------------------------
+CREATE TABLE files (
+    id                BIGINT       NOT NULL AUTO_INCREMENT,
+    storage_key       VARCHAR(500) NOT NULL,
+    original_filename VARCHAR(255)     NULL,
+    content_type      VARCHAR(100)     NULL,
+    size_bytes        BIGINT       NOT NULL DEFAULT 0,
+    owner_id          BIGINT           NULL,
+    created_at        DATETIME(6)      NULL,
+    updated_at        DATETIME(6)      NULL,
+    created_by        VARCHAR(100)     NULL,
+    updated_by        VARCHAR(100)     NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_files_storage_key UNIQUE (storage_key),
+    INDEX idx_files_owner (owner_id),
+    CONSTRAINT fk_files_owner FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;

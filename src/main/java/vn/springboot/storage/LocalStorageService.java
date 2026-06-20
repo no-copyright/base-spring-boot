@@ -70,7 +70,7 @@ public class LocalStorageService implements StorageService {
             throw new AppException(ErrorCode.FILE_STORAGE_FAILED);
         }
 
-        return new StoredFile(toUrl(relative), filename, file.getContentType(), file.getSize());
+        return new StoredFile(toUrl(relative), relative, filename, file.getContentType(), file.getSize());
     }
 
     @Override

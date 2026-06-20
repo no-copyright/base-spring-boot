@@ -41,15 +41,18 @@
     "code": 1000,
     "message": "Success",
     "data": {
-      "url": "/files/uploads/9f2c8b1e4a7d4c0fb1e2.png",
-      "filename": "9f2c8b1e4a7d4c0fb1e2.png",
+      "id": 42,
+      "url": "/files/misc/9f2c8b1e4a7d4c0fb1e2.png",
+      "filename": "photo.png",
       "contentType": "image/png",
       "size": 20480
     },
     "timestamp": "2026-06-20T08:00:00Z"
   }
   ```
-- **Dùng để:** lấy `url` rồi gắn vào resource bất kỳ (vd gửi kèm khi cập nhật một bản ghi có ảnh).
+- **`id`**: khóa của bản ghi trong bảng `files` (registry). Backend lưu metadata mọi file upload (chủ sở hữu, dung lượng, thời điểm) để phục vụ audit / dọn file mồ côi. FE có thể tham chiếu `id` **hoặc** `url` tuỳ nhu cầu.
+- **`filename`**: tên gốc người dùng upload (chỉ để hiển thị; tên thật trên đĩa là chuỗi ngẫu nhiên).
+- **Dùng để:** lấy `url`/`id` rồi gắn vào resource bất kỳ (vd gửi kèm khi cập nhật một bản ghi có ảnh).
 
 ---
 
@@ -118,5 +121,7 @@
 ## 5. Lưu ý vận hành (cho BE/DevOps)
 
 - Thư mục `uploads/` đã được `.gitignore`. Production nên **mount volume** hoặc trỏ `APP_STORAGE_LOCATION` tới ổ lưu trữ bền vững.
-- Muốn chuyển sang S3/MinIO sau này: chỉ cần thêm một bean `StorageService` mới, không phải sửa controller/service gọi nó.
+- Bảng `files` (registry) lưu metadata mọi upload: `storage_key`, `original_filename`, `content_type`, `size_bytes`, `owner_id` + audit. Đây là chỗ để sau này viết job dọn file mồ côi hoặc thống kê dung lượng theo user.
+- Tầng: `Controller / UserService → FileService` (lưu vật lý + ghi registry) `→ StorageService` (lưu vật lý) + `FileRepository`.
+- Muốn chuyển sang S3/MinIO sau này: chỉ cần thêm một bean `StorageService` mới, không phải sửa `FileService`/controller gọi nó.
 - Đổi `app.storage.public-path` thì nhớ cập nhật danh sách public endpoint trong `SecurityConfig` cho khớp.

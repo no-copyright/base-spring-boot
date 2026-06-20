@@ -18,12 +18,12 @@ import vn.springboot.dto.response.PageResponse;
 import vn.springboot.dto.response.user.UserResponse;
 import vn.springboot.entity.user.UserEntity;
 import vn.springboot.mapper.UserMapper;
+import vn.springboot.dto.response.file.FileUploadResponse;
 import vn.springboot.repository.UserRepository;
 import vn.springboot.repository.specification.UserSpecification;
 import vn.springboot.security.SecurityUtils;
+import vn.springboot.service.FileService;
 import vn.springboot.service.UserService;
-import vn.springboot.storage.StoredFile;
-import vn.springboot.storage.StorageService;
 
 import java.util.List;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final StorageService storageService;
+    private final FileService fileService;
     private final StorageProperties storageProperties;
 
     @Override
@@ -110,12 +110,12 @@ public class UserServiceImpl implements UserService {
         UserEntity me = currentManagedUser();
         String previousAvatar = me.getAvatarUrl();
 
-        StoredFile stored = storageService.store(file, AVATAR_DIR);
-        me.setAvatarUrl(stored.url());
+        FileUploadResponse uploaded = fileService.upload(file, AVATAR_DIR);
+        me.setAvatarUrl(uploaded.getUrl());
         UserResponse response = userMapper.toResponse(userRepository.save(me));
 
-        // Best-effort cleanup of the replaced image (after the new one is committed-in-memory).
-        storageService.delete(previousAvatar);
+        // Best-effort cleanup of the replaced image (registry row + bytes).
+        fileService.deleteByUrl(previousAvatar);
         return response;
     }
 
