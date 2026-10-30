@@ -1,4 +1,4 @@
-package vn.springboot.dto.response.user;
+package vn.springboot.modules.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

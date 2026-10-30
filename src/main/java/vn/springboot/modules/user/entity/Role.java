@@ -1,4 +1,4 @@
-package vn.springboot.entity.user;
+package vn.springboot.modules.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +24,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "roles")
-public class RoleEntity extends BaseEntity {
+public class Role extends BaseEntity {
 
     @Column(name = "name", unique = true, nullable = false, length = 50)
     private String name;
@@ -39,5 +39,5 @@ public class RoleEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<PermissionEntity> permissions = new HashSet<>();
+    private Set<Permission> permissions = new HashSet<>();
 }

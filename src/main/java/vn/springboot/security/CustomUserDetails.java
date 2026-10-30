@@ -5,14 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import vn.springboot.entity.user.UserEntity;
+import vn.springboot.modules.user.entity.User;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Adapts {@link UserEntity} to Spring Security's {@link UserDetails}.
+ * Adapts {@link User} to Spring Security's {@link UserDetails}.
  * Authorities are the user's roles (prefixed {@code ROLE_}) plus every
  * permission granted through those roles, enabling both {@code hasRole(...)}
  * and {@code hasAuthority(PERMISSION)} checks.
@@ -21,7 +21,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final transient UserEntity user;
+    private final transient User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

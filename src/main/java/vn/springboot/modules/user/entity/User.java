@@ -1,4 +1,4 @@
-package vn.springboot.entity.user;
+package vn.springboot.modules.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +28,7 @@ import java.util.Set;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "users")
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
 
     @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
@@ -53,5 +53,5 @@ public class UserEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 }

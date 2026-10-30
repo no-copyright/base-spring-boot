@@ -1,10 +1,10 @@
-package vn.springboot.service;
+package vn.springboot.modules.auth.service;
 
-import vn.springboot.dto.request.auth.LoginRequest;
-import vn.springboot.dto.request.auth.RefreshTokenRequest;
-import vn.springboot.dto.request.auth.RegisterRequest;
-import vn.springboot.dto.response.auth.AuthResponse;
-import vn.springboot.dto.response.user.UserResponse;
+import vn.springboot.modules.auth.dto.request.LoginRequest;
+import vn.springboot.modules.auth.dto.request.RefreshTokenRequest;
+import vn.springboot.modules.auth.dto.request.RegisterRequest;
+import vn.springboot.modules.auth.dto.response.AuthResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
 
 public interface AuthService {
 

@@ -1,10 +1,10 @@
-package vn.springboot.dto.response.auth;
+package vn.springboot.modules.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vn.springboot.dto.response.user.UserResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
 
 @Data
 @NoArgsConstructor

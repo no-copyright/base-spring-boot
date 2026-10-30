@@ -1,15 +1,15 @@
-package vn.springboot.repository;
+package vn.springboot.modules.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import vn.springboot.entity.user.PermissionEntity;
+import vn.springboot.modules.user.entity.Permission;
 
 import java.util.Optional;
 
 @Repository
-public interface PermissionRepository extends JpaRepository<PermissionEntity, Long> {
+public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
-    Optional<PermissionEntity> findByName(String name);
+    Optional<Permission> findByName(String name);
 
     boolean existsByName(String name);
 }

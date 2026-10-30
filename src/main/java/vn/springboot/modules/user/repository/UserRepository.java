@@ -1,18 +1,18 @@
-package vn.springboot.repository;
+package vn.springboot.modules.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import vn.springboot.entity.user.UserEntity;
+import vn.springboot.modules.user.entity.User;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-    Optional<UserEntity> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-    Optional<UserEntity> findByUsernameOrEmail(String username, String email);
+    Optional<User> findByUsernameOrEmail(String username, String email);
 
     boolean existsByUsername(String username);
 

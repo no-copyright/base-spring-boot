@@ -117,24 +117,35 @@ src/main/java/vn/springboot
 ├── common
 │   ├── entity/BaseEntity.java        # Audit fields (id, created/updated by/at)
 │   ├── exception/                    # ErrorCode, AppException, GlobalExceptionHandler
-│   └── response/ApiResponse.java     # Unified response envelope
+│   └── response/                     # ApiResponse (unified envelope), PageResponse
 ├── config
 │   ├── DataInitializer.java          # Seed roles/permissions/admin
-│   └── JpaAuditingConfig.java        # AuditorAware (current principal)
-├── controller                        # AuthController, UserController
-├── dto
-│   ├── request/                      # Login/Register/RefreshToken/UserSearch
-│   └── response/                     # Auth/User/Page responses
-├── entity/user                       # User, Role, Permission, RefreshToken
-├── mapper/UserMapper.java            # Entity → DTO
-├── repository                        # Spring Data repositories + Specification
+│   ├── JpaAuditingConfig.java        # AuditorAware (current principal)
+│   └── OpenApiConfig.java            # Swagger / OpenAPI metadata
 ├── security
 │   ├── SecurityConfig.java           # Filter chain, CORS, password encoder
 │   ├── jwt/                          # JwtService, JwtAuthenticationFilter
-│   ├── CustomUserDetails(Service)    # UserEntity → Spring Security UserDetails
+│   ├── CustomUserDetails(Service)    # User → Spring Security UserDetails
 │   └── *Handler / *EntryPoint        # Unified 401/403 JSON responses
-└── service                           # AuthService, UserService, EmailService (+ impl)
+└── modules                           # One package per business feature
+    ├── auth
+    │   ├── controller/               # AuthController
+    │   ├── dto/request|response      # Login/Register/RefreshToken, AuthResponse
+    │   ├── entity/                   # RefreshToken
+    │   ├── repository/               # RefreshTokenRepository
+    │   └── service/ (+ impl/)        # AuthService
+    ├── user
+    │   ├── controller/               # UserController
+    │   ├── dto/request|response      # UserSearchRequest, UserResponse
+    │   ├── entity/                   # User, Role, Permission
+    │   ├── mapper/                   # UserMapper (Entity → DTO)
+    │   ├── repository/               # Spring Data repositories + specification/
+    │   └── service/ (+ impl/)        # UserService
+    └── mail
+        └── service/ (+ impl/)        # EmailService
 ```
+
+To add a new feature, create `modules/<feature>/` with the same sub-packages (`controller`, `dto`, `entity`, `repository`, `service`, …). Entity classes are named after the domain concept without an `Entity` suffix (e.g. `User`, `Role`).
 
 ---
 

@@ -1,4 +1,4 @@
-package vn.springboot.entity.user;
+package vn.springboot.modules.auth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.springboot.common.entity.BaseEntity;
+import vn.springboot.modules.user.entity.User;
 
 import java.time.Instant;
 
@@ -27,14 +28,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "refresh_tokens")
-public class RefreshTokenEntity extends BaseEntity {
+public class RefreshToken extends BaseEntity {
 
     @Column(name = "token", unique = true, nullable = false, length = 100)
     private String token;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private User user;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;

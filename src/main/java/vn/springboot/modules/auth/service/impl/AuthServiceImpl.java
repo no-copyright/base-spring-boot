@@ -1,4 +1,4 @@
-package vn.springboot.service.impl;
+package vn.springboot.modules.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.springboot.common.exception.AppException;
 import vn.springboot.common.exception.ErrorCode;
-import vn.springboot.dto.request.auth.LoginRequest;
-import vn.springboot.dto.request.auth.RefreshTokenRequest;
-import vn.springboot.dto.request.auth.RegisterRequest;
-import vn.springboot.dto.response.auth.AuthResponse;
-import vn.springboot.dto.response.user.UserResponse;
-import vn.springboot.entity.user.RefreshTokenEntity;
-import vn.springboot.entity.user.RoleEntity;
-import vn.springboot.entity.user.UserEntity;
-import vn.springboot.mapper.UserMapper;
-import vn.springboot.repository.RefreshTokenRepository;
-import vn.springboot.repository.RoleRepository;
-import vn.springboot.repository.UserRepository;
+import vn.springboot.modules.auth.dto.request.LoginRequest;
+import vn.springboot.modules.auth.dto.request.RefreshTokenRequest;
+import vn.springboot.modules.auth.dto.request.RegisterRequest;
+import vn.springboot.modules.auth.dto.response.AuthResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
+import vn.springboot.modules.auth.entity.RefreshToken;
+import vn.springboot.modules.user.entity.Role;
+import vn.springboot.modules.user.entity.User;
+import vn.springboot.modules.user.mapper.UserMapper;
+import vn.springboot.modules.auth.repository.RefreshTokenRepository;
+import vn.springboot.modules.user.repository.RoleRepository;
+import vn.springboot.modules.user.repository.UserRepository;
 import vn.springboot.security.CustomUserDetails;
 import vn.springboot.security.JwtProperties;
 import vn.springboot.security.jwt.JwtService;
-import vn.springboot.service.AuthService;
+import vn.springboot.modules.auth.service.AuthService;
 
 import java.time.Instant;
 import java.util.Set;
@@ -56,10 +56,10 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
-        RoleEntity defaultRole = roleRepository.findByName(DEFAULT_ROLE)
+        Role defaultRole = roleRepository.findByName(DEFAULT_ROLE)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        UserEntity user = UserEntity.builder()
+        User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse refresh(RefreshTokenRequest request) {
-        RefreshTokenEntity stored = refreshTokenRepository.findByToken(request.getRefreshToken())
+        RefreshToken stored = refreshTokenRepository.findByToken(request.getRefreshToken())
                 .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (stored.isRevoked()) {
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         stored.setRevoked(true);
         refreshTokenRepository.save(stored);
 
-        UserEntity user = stored.getUser();
+        User user = stored.getUser();
         return issueTokens(user, new CustomUserDetails(user));
     }
 
@@ -122,9 +122,9 @@ public class AuthServiceImpl implements AuthService {
         return userMapper.toResponse(principal.getUser());
     }
 
-    private AuthResponse issueTokens(UserEntity user, CustomUserDetails principal) {
+    private AuthResponse issueTokens(User user, CustomUserDetails principal) {
         String accessToken = jwtService.generateAccessToken(principal);
-        RefreshTokenEntity refreshToken = createRefreshToken(user);
+        RefreshToken refreshToken = createRefreshToken(user);
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -134,8 +134,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    private RefreshTokenEntity createRefreshToken(UserEntity user) {
-        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
+    private RefreshToken createRefreshToken(User user) {
+        RefreshToken refreshToken = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(user)
                 .expiresAt(Instant.now().plusMillis(jwtProperties.getRefreshTokenExpiration()))

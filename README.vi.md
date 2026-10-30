@@ -117,24 +117,35 @@ src/main/java/vn/springboot
 ├── common
 │   ├── entity/BaseEntity.java        # Trường audit (id, created/updated by/at)
 │   ├── exception/                    # ErrorCode, AppException, GlobalExceptionHandler
-│   └── response/ApiResponse.java     # Lớp vỏ phản hồi chung
+│   └── response/                     # ApiResponse (lớp vỏ phản hồi chung), PageResponse
 ├── config
 │   ├── DataInitializer.java          # Seed vai trò/quyền/admin
-│   └── JpaAuditingConfig.java        # AuditorAware (người dùng hiện tại)
-├── controller                        # AuthController, UserController
-├── dto
-│   ├── request/                      # Login/Register/RefreshToken/UserSearch
-│   └── response/                     # Phản hồi Auth/User/Page
-├── entity/user                       # User, Role, Permission, RefreshToken
-├── mapper/UserMapper.java            # Entity → DTO
-├── repository                        # Spring Data repository + Specification
+│   ├── JpaAuditingConfig.java        # AuditorAware (người dùng hiện tại)
+│   └── OpenApiConfig.java            # Cấu hình Swagger / OpenAPI
 ├── security
 │   ├── SecurityConfig.java           # Filter chain, CORS, password encoder
 │   ├── jwt/                          # JwtService, JwtAuthenticationFilter
-│   ├── CustomUserDetails(Service)    # UserEntity → UserDetails của Spring Security
+│   ├── CustomUserDetails(Service)    # User → UserDetails của Spring Security
 │   └── *Handler / *EntryPoint        # Phản hồi JSON 401/403 thống nhất
-└── service                           # AuthService, UserService, EmailService (+ impl)
+└── modules                           # Mỗi tính năng nghiệp vụ là một package
+    ├── auth
+    │   ├── controller/               # AuthController
+    │   ├── dto/request|response      # Login/Register/RefreshToken, AuthResponse
+    │   ├── entity/                   # RefreshToken
+    │   ├── repository/               # RefreshTokenRepository
+    │   └── service/ (+ impl/)        # AuthService
+    ├── user
+    │   ├── controller/               # UserController
+    │   ├── dto/request|response      # UserSearchRequest, UserResponse
+    │   ├── entity/                   # User, Role, Permission
+    │   ├── mapper/                   # UserMapper (Entity → DTO)
+    │   ├── repository/               # Spring Data repository + specification/
+    │   └── service/ (+ impl/)        # UserService
+    └── mail
+        └── service/ (+ impl/)        # EmailService
 ```
+
+Để thêm tính năng mới, tạo `modules/<tên-tính-năng>/` với các package con tương tự (`controller`, `dto`, `entity`, `repository`, `service`, …). Class entity đặt theo tên khái niệm nghiệp vụ, không có hậu tố `Entity` (ví dụ `User`, `Role`).
 
 ---
 

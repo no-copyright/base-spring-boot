@@ -1,4 +1,4 @@
-package vn.springboot.dto.request.auth;
+package vn.springboot.modules.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

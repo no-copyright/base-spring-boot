@@ -1,8 +1,8 @@
-package vn.springboot.service;
+package vn.springboot.modules.user.service;
 
-import vn.springboot.dto.request.user.UserSearchRequest;
-import vn.springboot.dto.response.PageResponse;
-import vn.springboot.dto.response.user.UserResponse;
+import vn.springboot.modules.user.dto.request.UserSearchRequest;
+import vn.springboot.common.response.PageResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
 
 public interface UserService {
 

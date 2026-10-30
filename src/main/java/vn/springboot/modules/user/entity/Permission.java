@@ -1,4 +1,4 @@
-package vn.springboot.entity.user;
+package vn.springboot.modules.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ import vn.springboot.common.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "permissions")
-public class PermissionEntity extends BaseEntity {
+public class Permission extends BaseEntity {
 
     /** Permission code, e.g. {@code USER_READ}, {@code USER_WRITE}. */
     @Column(name = "name", unique = true, nullable = false, length = 100)

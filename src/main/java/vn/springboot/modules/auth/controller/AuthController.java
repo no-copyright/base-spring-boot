@@ -1,4 +1,4 @@
-package vn.springboot.controller;
+package vn.springboot.modules.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.springboot.common.response.ApiResponse;
-import vn.springboot.dto.request.auth.LoginRequest;
-import vn.springboot.dto.request.auth.RefreshTokenRequest;
-import vn.springboot.dto.request.auth.RegisterRequest;
-import vn.springboot.dto.response.auth.AuthResponse;
-import vn.springboot.dto.response.user.UserResponse;
-import vn.springboot.service.AuthService;
+import vn.springboot.modules.auth.dto.request.LoginRequest;
+import vn.springboot.modules.auth.dto.request.RefreshTokenRequest;
+import vn.springboot.modules.auth.dto.request.RegisterRequest;
+import vn.springboot.modules.auth.dto.response.AuthResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
+import vn.springboot.modules.auth.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")

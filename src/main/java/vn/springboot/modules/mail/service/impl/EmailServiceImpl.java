@@ -1,4 +1,4 @@
-package vn.springboot.service.impl;
+package vn.springboot.modules.mail.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import vn.springboot.common.exception.AppException;
 import vn.springboot.common.exception.ErrorCode;
-import vn.springboot.service.EmailService;
+import vn.springboot.modules.mail.service.EmailService;
 
 @Slf4j
 @Service

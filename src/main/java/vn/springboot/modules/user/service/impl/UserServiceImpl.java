@@ -1,4 +1,4 @@
-package vn.springboot.service.impl;
+package vn.springboot.modules.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.springboot.common.exception.AppException;
 import vn.springboot.common.exception.ErrorCode;
-import vn.springboot.dto.request.user.UserSearchRequest;
-import vn.springboot.dto.response.PageResponse;
-import vn.springboot.dto.response.user.UserResponse;
-import vn.springboot.entity.user.UserEntity;
-import vn.springboot.mapper.UserMapper;
-import vn.springboot.repository.UserRepository;
-import vn.springboot.repository.specification.UserSpecification;
-import vn.springboot.service.UserService;
+import vn.springboot.modules.user.dto.request.UserSearchRequest;
+import vn.springboot.common.response.PageResponse;
+import vn.springboot.modules.user.dto.response.UserResponse;
+import vn.springboot.modules.user.entity.User;
+import vn.springboot.modules.user.mapper.UserMapper;
+import vn.springboot.modules.user.repository.UserRepository;
+import vn.springboot.modules.user.repository.specification.UserSpecification;
+import vn.springboot.modules.user.service.UserService;
 
 import java.util.List;
 import java.util.Set;
@@ -41,9 +41,9 @@ public class UserServiceImpl implements UserService {
                 Math.max(0, request.getPage()),
                 Math.clamp(request.getSize(), 1, MAX_PAGE_SIZE),
                 resolveSort(request));
-        Specification<UserEntity> specification = UserSpecification.build(request);
+        Specification<User> specification = UserSpecification.build(request);
 
-        Page<UserEntity> userPage = userRepository.findAll(specification, pageable);
+        Page<User> userPage = userRepository.findAll(specification, pageable);
 
         List<UserResponse> content = userPage.getContent().stream()
                 .map(userMapper::toResponse)

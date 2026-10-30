@@ -1,4 +1,4 @@
-package vn.springboot.service;
+package vn.springboot.modules.mail.service;
 
 /**
  * Sends transactional emails. Kept behind an interface so callers depend on the
